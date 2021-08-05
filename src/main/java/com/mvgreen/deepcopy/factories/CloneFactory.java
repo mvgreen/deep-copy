@@ -1,9 +1,16 @@
 package com.mvgreen.deepcopy.factories;
 
-public interface CloneFactory<T> {
+public abstract class CloneFactory<T> {
 
-    T clone(T src);
+    private Class<T> cloneClass;
 
-    Class<T> getType();
+    public CloneFactory(Class<T> cloneClass) {
+        this.cloneClass = cloneClass;
+    }
 
+    public abstract T clone(T src);
+
+    public Class<T> getCloneClass() {
+        return cloneClass;
+    }
 }
