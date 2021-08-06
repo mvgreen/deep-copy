@@ -9,9 +9,10 @@ public @interface CopyMode {
 
     enum Mode {
         DEEP,
-        SHALLOW
+        SHALLOW,
+        SKIP
     }
 
-    Mode mode();
+    Mode value();
 
 }
