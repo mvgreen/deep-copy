@@ -15,4 +15,6 @@ public @interface CopyMode {
 
     Mode value();
 
+    boolean copyItems() default false;
+
 }

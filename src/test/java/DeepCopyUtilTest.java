@@ -1,9 +1,12 @@
 import com.mvgreen.deepcopy.DeepCopyUtil;
-import com.mvgreen.deepcopy.factories.CloneFactory;
+import com.mvgreen.deepcopy.CloneFactory;
 import dummies.DummyWithoutDefaultConstructor;
 import dummies.EmptyDummy;
 import dummies.InheritedCopyableDummy;
 import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -18,23 +21,23 @@ public class DeepCopyUtilTest {
         DummyWithoutDefaultConstructor inherited = new InheritedCopyableDummy(0);
 
         assertThrows(IllegalArgumentException.class, () -> {
-            deepCopyUtil.deepCopy(emptyDummy);
+            deepCopyUtil.deepCopy(emptyDummy, Collections.emptyMap());
         });
         assertThrows(IllegalArgumentException.class, () -> {
-            deepCopyUtil.deepCopy(withoutDefaultConstructor);
+            deepCopyUtil.deepCopy(withoutDefaultConstructor, Collections.emptyMap());
         });
 
-        deepCopyUtil.addCloneFactory(new CloneFactory<>(EmptyDummy.class) {
+        deepCopyUtil.addCloneFactory(new CloneFactory<>(EmptyDummy.class, deepCopyUtil) {
             @Override
-            public EmptyDummy clone(EmptyDummy src) {
+            public EmptyDummy clone(EmptyDummy src, Map<Object, Object> cloneReferences, Map<String, Object> params) {
                 return new EmptyDummy();
             }
         });
         assertDoesNotThrow(() -> {
-            deepCopyUtil.deepCopy(emptyDummy);
+            deepCopyUtil.deepCopy(emptyDummy, Collections.emptyMap());
         });
         assertDoesNotThrow(() -> {
-            deepCopyUtil.deepCopy(inherited);
+            deepCopyUtil.deepCopy(inherited, Collections.emptyMap());
         });
     }
 
