@@ -27,12 +27,12 @@ public class DeepCopyUtilTest {
             deepCopyUtil.deepCopy(withoutDefaultConstructor, Collections.emptyMap());
         });
 
-        deepCopyUtil.addCloneFactory(new CloneFactory<>(EmptyDummy.class, deepCopyUtil) {
+        deepCopyUtil.addCloneFactory(new CloneFactory<EmptyDummy>(deepCopyUtil) {
             @Override
             public EmptyDummy clone(EmptyDummy src, Map<Object, Object> cloneReferences, Map<String, Object> params) {
                 return new EmptyDummy();
             }
-        });
+        }, EmptyDummy.class);
         assertDoesNotThrow(() -> {
             deepCopyUtil.deepCopy(emptyDummy, Collections.emptyMap());
         });

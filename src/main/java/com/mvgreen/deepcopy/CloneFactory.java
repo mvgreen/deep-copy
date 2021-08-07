@@ -5,12 +5,11 @@ import java.util.Map;
 public abstract class CloneFactory<T> {
 
     public static final String PARAM_COPY_ITEMS = "PARAM_COPY_ITEMS";
+    public static final String PARAM_COPY_ITEMS_RECURSIVELY = "PARAM_COPY_ITEMS_RECURSIVELY";
 
-    private Class<T> cloneClass;
     private DeepCopyUtil deepCopyUtil;
 
-    public CloneFactory(Class<T> cloneClass, DeepCopyUtil deepCopyUtil) {
-        this.cloneClass = cloneClass;
+    public CloneFactory(DeepCopyUtil deepCopyUtil) {
         this.deepCopyUtil = deepCopyUtil;
     }
 
@@ -20,7 +19,4 @@ public abstract class CloneFactory<T> {
         return deepCopyUtil.deepCopy(src, cloneReferences, params);
     }
 
-    public Class<T> getCloneClass() {
-        return cloneClass;
-    }
 }
