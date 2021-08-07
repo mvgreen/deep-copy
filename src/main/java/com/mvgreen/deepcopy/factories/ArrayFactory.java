@@ -24,8 +24,11 @@ public class ArrayFactory extends CloneFactory<Object> {
         boolean copyItemsRecursively = (boolean) params.getOrDefault(CloneFactory.PARAM_COPY_ITEMS_RECURSIVELY, false);
         for (int i = 0; i < length; i++) {
             Object item = Array.get(src, i);
+
             Object itemClone;
-            if (item.getClass().isArray()) {
+            if (item == null) {
+                itemClone = null;
+            } else if (item.getClass().isArray()) {
                 itemClone = clone(item, cloneReferences, params);
             } else if (copyItems || copyItemsRecursively) {
                 Map<String, Object> newParams = new HashMap<>(params);
@@ -36,7 +39,7 @@ public class ArrayFactory extends CloneFactory<Object> {
             } else {
                 itemClone = item;
             }
-            cloneReferences.put(item, itemClone);
+            Array.set(clone, i, itemClone);
         }
         return clone;
     }

@@ -80,6 +80,13 @@ public class DeepCopyUtil {
             return;
         }
 
+        field.setAccessible(true);
+        Object srcFieldValue = field.get(src);
+        if (srcFieldValue == null) {
+            field.set(clone, null);
+            return;
+        }
+
         boolean copyItems = false;
         CopyMode.Mode copyMode;
         if (field.isAnnotationPresent(CopyMode.class)) {
@@ -87,7 +94,8 @@ public class DeepCopyUtil {
             copyItems = annotation.copyItems();
             copyMode = annotation.value();
         } else {
-            Class<?> klass = src.getClass();
+            Class<?> klass = srcFieldValue.getClass();
+
             if (klass.isAnnotationPresent(DeepCopyable.class) || cloneFactories.containsKey(klass)) {
                 copyMode = CopyMode.Mode.DEEP;
             } else {
@@ -95,31 +103,19 @@ public class DeepCopyUtil {
             }
         }
 
-        field.setAccessible(true);
-        Object srcFieldValue = field.get(src);
-        if (srcFieldValue == null) {
-            return;
-        }
         if (isPrimitiveOrWrapperOrString(srcFieldValue.getClass())) {
             copyMode = CopyMode.Mode.SHALLOW;
-        }
-        if (cloneReferences.containsKey(srcFieldValue)) {
-            field.set(clone, cloneReferences.get(srcFieldValue));
-            return;
         }
 
         switch (copyMode) {
             case DEEP:
                 Map<String, Object> newParams = new HashMap<>(params);
-                if (!newParams.containsKey(CloneFactory.PARAM_COPY_ITEMS)) {
-                    newParams.put(CloneFactory.PARAM_COPY_ITEMS, copyItems);
-                }
+                newParams.put(CloneFactory.PARAM_COPY_ITEMS, copyItems);
 
                 Object fieldClone = deepCopy(srcFieldValue, cloneReferences, newParams);
                 field.set(clone, fieldClone);
                 break;
             case SHALLOW:
-                cloneReferences.put(srcFieldValue, srcFieldValue);
                 field.set(clone, srcFieldValue);
                 break;
             case SKIP:
@@ -128,7 +124,12 @@ public class DeepCopyUtil {
     }
 
     private <T> T copyObjectWithFactory(T src, Map<Object, Object> cloneReferences, Map<String, Object> params) {
-        CloneFactory<T> factory = (CloneFactory<T>) cloneFactories.get(src.getClass());
+        CloneFactory<T> factory;
+        if (src.getClass().isArray()) {
+            factory = (CloneFactory<T>) cloneFactories.get(Array.class);
+        } else {
+            factory = (CloneFactory<T>) cloneFactories.get(src.getClass());
+        }
         return factory.clone(src, cloneReferences, params);
     }
 
