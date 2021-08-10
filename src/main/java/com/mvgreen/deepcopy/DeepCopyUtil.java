@@ -26,7 +26,7 @@ public class DeepCopyUtil {
     }
 
     public DeepCopyUtil() {
-        cloneFactories.put(Array.class, new ArrayFactory(this));
+        addCloneFactory(new ArrayFactory(this), Array.class);
     }
 
     public <T> T deepCopy(T src) throws CloneException {

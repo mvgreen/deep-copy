@@ -4,7 +4,6 @@ import com.mvgreen.deepcopy.CloneFactory;
 import com.mvgreen.deepcopy.DeepCopyUtil;
 
 import java.lang.reflect.Array;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +15,9 @@ public class ArrayFactory extends CloneFactory<Object> {
 
     @Override
     public Object clone(Object src, Map<Object, Object> cloneReferences, Map<String, Object> params) {
+        if (cloneReferences.containsKey(src)) {
+            return cloneReferences.get(src);
+        }
         int length = Array.getLength(src);
         Object clone = Array.newInstance(src.getClass().getComponentType(), length);
         cloneReferences.put(src, clone);
