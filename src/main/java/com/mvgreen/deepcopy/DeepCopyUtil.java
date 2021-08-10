@@ -46,13 +46,44 @@ public class DeepCopyUtil {
     }
 
     private <T> T copyDeepCopyableObject(T src, Map<Object, Object> cloneReferences, Map<String, Object> params) {
-        Class<?> klass = src.getClass();
-        T clone;
+        Class<?> srcClass = src.getClass();
+        T clone = null;
         try {
-            Constructor<?> constructor = klass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            //noinspection unchecked
-            clone = (T) constructor.newInstance();
+            if (!srcClass.isMemberClass()) {
+                Constructor<?> constructor = srcClass.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                //noinspection unchecked
+                clone = (T) constructor.newInstance();
+            } else {
+                Object outerObject = getOuterObject(src);
+                Object outerObjectClone = deepCopy(outerObject, cloneReferences, null);
+
+                // TODO check with inheritance
+
+                // Special case: outer object is not cloned yet (or is not associated with the root object directly)
+                // After the previous line, if the inner object was referenced somewhere in the outer, src's clone may appear in the map
+                if (cloneReferences.containsKey(src)) {
+                    //noinspection unchecked
+                    return (T) cloneReferences.get(src);
+                }
+                for (Constructor<?> constructor : srcClass.getDeclaredConstructors()) {
+                    if (constructor.getParameterCount() == 0) {
+                        constructor.setAccessible(true);
+                        //noinspection unchecked
+                        clone = (T) constructor.newInstance();
+                        break;
+                    }
+                    if (constructor.getParameterCount() == 1 && constructor.getParameterTypes()[0].isAssignableFrom(outerObjectClone.getClass())) {
+                        constructor.setAccessible(true);
+                        //noinspection unchecked
+                        clone = (T) constructor.newInstance(outerObjectClone);
+                        break;
+                    }
+                }
+                if (clone == null) {
+                    throw new NoSuchMethodException("constructor with zero arguments not found");
+                }
+            }
         } catch (Exception e) {
             throw new CloneException(e);
         }
@@ -60,7 +91,7 @@ public class DeepCopyUtil {
         cloneReferences.put(src, clone);
 
         try {
-            Class<?> fieldsContainer = klass;
+            Class<?> fieldsContainer = srcClass;
             do {
                 for (Field field : fieldsContainer.getDeclaredFields()) {
                     copyField(field, src, clone, cloneReferences, params);
@@ -103,7 +134,7 @@ public class DeepCopyUtil {
             }
         }
 
-        if (isPrimitiveOrWrapperOrString(srcFieldValue.getClass())) {
+        if (isPrimitiveOrWrapperOrString(srcFieldValue.getClass()) || isEnum(srcFieldValue.getClass())) {
             copyMode = CopyMode.Mode.SHALLOW;
         }
 
@@ -148,10 +179,28 @@ public class DeepCopyUtil {
         }
 
         boolean found = false;
-        for (Constructor<?> constructor : klass.getDeclaredConstructors()) {
-            if (constructor.getParameterCount() == 0) {
-                found = true;
-                break;
+        if (!klass.isMemberClass()) {
+            for (Constructor<?> constructor : klass.getDeclaredConstructors()) {
+                if (constructor.getParameterCount() == 0) {
+                    found = true;
+                    break;
+                }
+            }
+        } else {
+            try {
+                Object outerObject = getOuterObject(arg);
+                Class<?> outerObjectClass = outerObject.getClass();
+                for (Constructor<?> constructor : klass.getDeclaredConstructors()) {
+                    if (constructor.getParameterCount() == 1) {
+                        Class<?> paramClass = constructor.getParameterTypes()[0];
+                        if (paramClass.equals(outerObjectClass)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new CloneException(e);
             }
         }
         if (!found) {
@@ -164,6 +213,22 @@ public class DeepCopyUtil {
                 klass == Double.class || klass == Float.class || klass == Long.class ||
                 klass == Integer.class || klass == Short.class || klass == Character.class ||
                 klass == Byte.class || klass == Boolean.class || klass == String.class;
+    }
+
+    private boolean isEnum(Class<?> klass) {
+        if (klass.isEnum()) {
+            return true;
+        }
+        Class<?> superClass = klass.getSuperclass();
+        return superClass != null && superClass.isEnum();
+    }
+
+    private Object getOuterObject(Object inner) throws NoSuchFieldException, IllegalAccessException {
+        Class<?> klass = inner.getClass();
+        // a dirty hack, but there's no better generic way to obtain the outer object
+        Field outerObjectField = klass.getDeclaredField("this$0");
+        outerObjectField.setAccessible(true);
+        return outerObjectField.get(inner);
     }
 
 }
