@@ -43,6 +43,8 @@ public class DeepCopyUtil {
         validateArgument(src);
         if (cloneReferences.containsKey(src)) {
             return (T) cloneReferences.get(src);
+        } else if (isPrimitiveOrWrapperOrString(src.getClass()) || isEnum(src.getClass())) {
+            return src;
         } else if (src.getClass().isAnnotationPresent(DeepCopyable.class)) {
             return copyDeepCopyableObject(src, cloneReferences, params);
         } else {
@@ -175,7 +177,7 @@ public class DeepCopyUtil {
         }
 
         Class<?> klass = arg.getClass();
-        if (klass.isArray() || isPrimitiveOrWrapperOrString(klass)) {
+        if (klass.isArray() || isPrimitiveOrWrapperOrString(klass) || isEnum(klass)) {
             return;
         }
         if (!klass.isAnnotationPresent(DeepCopyable.class) && !cloneFactories.containsKey(klass)) {
