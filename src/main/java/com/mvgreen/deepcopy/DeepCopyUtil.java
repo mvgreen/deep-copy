@@ -29,6 +29,11 @@ public class DeepCopyUtil {
         cloneFactories.put(Array.class, new ArrayFactory(this));
     }
 
+    public <T> T deepCopy(T src) throws CloneException {
+        Map<Object, Object> cloneReferences = new HashMap<>();
+        return deepCopy(src, cloneReferences, Collections.emptyMap());
+    }
+
     public <T> T deepCopy(T src, Map<String, Object> params) throws CloneException {
         Map<Object, Object> cloneReferences = new HashMap<>();
         return deepCopy(src, cloneReferences, params == null ? Collections.emptyMap() : params);
