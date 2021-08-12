@@ -31,16 +31,17 @@ public class DeepCopyUtil {
 
     public <T> T deepCopy(T src) throws CloneException {
         Map<Object, Object> cloneReferences = new HashMap<>();
-        return deepCopy(src, cloneReferences, Collections.emptyMap());
+        return deepCopy(src, cloneReferences, null);
     }
 
     public <T> T deepCopy(T src, Map<String, Object> params) throws CloneException {
         Map<Object, Object> cloneReferences = new HashMap<>();
-        return deepCopy(src, cloneReferences, params == null ? Collections.emptyMap() : params);
+        return deepCopy(src, cloneReferences, params);
     }
 
     protected <T> T deepCopy(T src, Map<Object, Object> cloneReferences, Map<String, Object> params) {
         validateArgument(src);
+        params = params == null ? Collections.emptyMap() : params;
         if (cloneReferences.containsKey(src)) {
             return (T) cloneReferences.get(src);
         } else if (isPrimitiveOrWrapperOrString(src.getClass()) || isEnum(src.getClass())) {
