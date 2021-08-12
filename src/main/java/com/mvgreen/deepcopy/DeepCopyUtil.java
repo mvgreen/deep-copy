@@ -57,7 +57,7 @@ public class DeepCopyUtil {
         Class<?> srcClass = src.getClass();
         T clone = null;
         try {
-            if (!srcClass.isMemberClass()) {
+            if (!isInnerClass(srcClass)) {
                 Constructor<?> constructor = srcClass.getDeclaredConstructor();
                 constructor.setAccessible(true);
                 //noinspection unchecked
@@ -75,12 +75,6 @@ public class DeepCopyUtil {
                     return (T) cloneReferences.get(src);
                 }
                 for (Constructor<?> constructor : srcClass.getDeclaredConstructors()) {
-                    if (constructor.getParameterCount() == 0) {
-                        constructor.setAccessible(true);
-                        //noinspection unchecked
-                        clone = (T) constructor.newInstance();
-                        break;
-                    }
                     if (constructor.getParameterCount() == 1 && constructor.getParameterTypes()[0].isAssignableFrom(outerObjectClone.getClass())) {
                         constructor.setAccessible(true);
                         //noinspection unchecked
@@ -187,7 +181,7 @@ public class DeepCopyUtil {
         }
 
         boolean found = false;
-        if (!klass.isMemberClass()) {
+        if (!isInnerClass(klass)) {
             for (Constructor<?> constructor : klass.getDeclaredConstructors()) {
                 if (constructor.getParameterCount() == 0) {
                     found = true;
@@ -229,6 +223,10 @@ public class DeepCopyUtil {
         }
         Class<?> superClass = klass.getSuperclass();
         return superClass != null && superClass.isEnum();
+    }
+
+    private boolean isInnerClass(Class<?> klass) {
+        return klass.isMemberClass() && !Modifier.isStatic(klass.getModifiers());
     }
 
     private Object getOuterObject(Object inner) throws NoSuchFieldException, IllegalAccessException {
