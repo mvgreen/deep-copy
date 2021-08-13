@@ -57,14 +57,14 @@ public class DeepCopyUtil {
         Class<?> srcClass = src.getClass();
         T clone = null;
         try {
-            if (!isInnerClass(srcClass)) {
+            if (!isInnerOrLocalClass(srcClass)) {
                 Constructor<?> constructor = srcClass.getDeclaredConstructor();
                 constructor.setAccessible(true);
                 //noinspection unchecked
                 clone = (T) constructor.newInstance();
             } else {
                 Object outerObject = getOuterObject(src);
-                Object outerObjectClone = deepCopy(outerObject, cloneReferences, null);
+                Object outerObjectClone = cloneOuterObject(outerObject, cloneReferences);
 
                 // TODO check with inheritance
 
@@ -181,7 +181,7 @@ public class DeepCopyUtil {
         }
 
         boolean found = false;
-        if (!isInnerClass(klass)) {
+        if (!isInnerOrLocalClass(klass)) {
             for (Constructor<?> constructor : klass.getDeclaredConstructors()) {
                 if (constructor.getParameterCount() == 0) {
                     found = true;
@@ -225,8 +225,8 @@ public class DeepCopyUtil {
         return superClass != null && superClass.isEnum();
     }
 
-    private boolean isInnerClass(Class<?> klass) {
-        return klass.isMemberClass() && !Modifier.isStatic(klass.getModifiers());
+    private boolean isInnerOrLocalClass(Class<?> klass) {
+        return klass.isLocalClass() || (klass.isMemberClass() && !Modifier.isStatic(klass.getModifiers()));
     }
 
     private Object getOuterObject(Object inner) throws NoSuchFieldException, IllegalAccessException {
@@ -235,6 +235,16 @@ public class DeepCopyUtil {
         Field outerObjectField = klass.getDeclaredField("this$0");
         outerObjectField.setAccessible(true);
         return outerObjectField.get(inner);
+    }
+
+    private Object cloneOuterObject(Object src, Map<Object, Object> cloneReferences) {
+        if (cloneReferences.containsKey(src)) {
+            return cloneReferences.get(src);
+        }
+        if (src.getClass().isAnnotationPresent(DeepCopyable.class) || cloneFactories.containsKey(src.getClass())) {
+            return deepCopy(src, cloneReferences, null);
+        }
+        return src;
     }
 
 }
