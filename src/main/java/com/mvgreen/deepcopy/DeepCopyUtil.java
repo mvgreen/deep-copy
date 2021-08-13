@@ -176,7 +176,7 @@ public class DeepCopyUtil {
             return;
         }
         if (!klass.isAnnotationPresent(DeepCopyable.class) && !cloneFactories.containsKey(klass)) {
-            throw new IllegalArgumentException("class " + klass +
+            throw new IllegalArgumentException(klass +
                     " is not annotated with @DeepCopyable and does not have a registered factory");
         }
 
