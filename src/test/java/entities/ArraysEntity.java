@@ -2,6 +2,7 @@ package entities;
 
 import com.mvgreen.deepcopy.annotations.CopyMode;
 import com.mvgreen.deepcopy.annotations.DeepCopyable;
+import entities.dummies.EmptyDummy;
 
 import java.util.Arrays;
 
@@ -26,8 +27,8 @@ public class ArraysEntity {
     };
 
     @CopyMode(value = CopyMode.Mode.DEEP)
-    EmptyEntity[] entityArray = new EmptyEntity[] {
-            new EmptyEntity(), null
+    EmptyDummy[] entityArray = new EmptyDummy[] {
+            new EmptyDummy(), null
     };
 
     @CopyMode(value = CopyMode.Mode.DEEP, copyItems = true)

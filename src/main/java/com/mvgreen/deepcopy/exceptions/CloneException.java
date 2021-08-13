@@ -6,4 +6,8 @@ public class CloneException extends RuntimeException {
         super(cause);
     }
 
+    public CloneException(String message) {
+        super(message);
+    }
+
 }

@@ -4,14 +4,13 @@ import com.mvgreen.deepcopy.annotations.CopyMode;
 import com.mvgreen.deepcopy.annotations.DeepCopyable;
 import com.mvgreen.deepcopy.exceptions.CloneException;
 import com.mvgreen.deepcopy.factories.ArrayFactory;
+import com.mvgreen.deepcopy.factories.CollectionFactory;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DeepCopyUtil {
 
@@ -27,6 +26,14 @@ public class DeepCopyUtil {
 
     public DeepCopyUtil() {
         addCloneFactory(new ArrayFactory(this), Array.class);
+        CollectionFactory collectionFactory = new CollectionFactory(this);
+        addCloneFactory(collectionFactory, ArrayList.class);
+        addCloneFactory(collectionFactory, LinkedList.class);
+        addCloneFactory(collectionFactory, Vector.class);
+        addCloneFactory(collectionFactory, Stack.class);
+
+        addCloneFactory(collectionFactory, HashSet.class);
+        addCloneFactory(collectionFactory, LinkedHashSet.class);
     }
 
     public <T> T deepCopy(T src) throws CloneException {

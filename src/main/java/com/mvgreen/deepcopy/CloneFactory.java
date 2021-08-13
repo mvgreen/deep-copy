@@ -1,5 +1,7 @@
 package com.mvgreen.deepcopy;
 
+import com.mvgreen.deepcopy.exceptions.CloneException;
+
 import java.util.Map;
 
 public abstract class CloneFactory<T> {
@@ -13,7 +15,7 @@ public abstract class CloneFactory<T> {
         this.deepCopyUtil = deepCopyUtil;
     }
 
-    public abstract T clone(T src, Map<Object, Object> cloneReferences, Map<String, Object> params);
+    public abstract T clone(T src, Map<Object, Object> cloneReferences, Map<String, Object> params) throws CloneException;
 
     protected <K> K cloneMember(K src, Map<Object, Object> cloneReferences, Map<String, Object> params) {
         return deepCopyUtil.deepCopy(src, cloneReferences, params);
