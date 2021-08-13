@@ -204,7 +204,7 @@ public class DeepCopyUtil {
             }
         }
         if (!found) {
-            throw new IllegalArgumentException("class " + klass + " does not have a constructor with no parameters");
+            throw new IllegalArgumentException(klass + " does not have a constructor with no parameters");
         }
     }
 
