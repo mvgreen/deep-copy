@@ -66,8 +66,6 @@ public class DeepCopyUtil {
                 Object outerObject = getOuterObject(src);
                 Object outerObjectClone = cloneOuterObject(outerObject, cloneReferences);
 
-                // TODO check with inheritance
-
                 // Special case: outer object is not cloned yet (or is not associated with the root object directly)
                 // After the previous line, if the inner object was referenced somewhere in the outer, src's clone may appear in the map
                 if (cloneReferences.containsKey(src)) {

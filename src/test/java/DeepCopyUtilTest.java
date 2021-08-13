@@ -1,15 +1,20 @@
-import com.mvgreen.deepcopy.DeepCopyUtil;
 import com.mvgreen.deepcopy.CloneFactory;
-import dummies.DummyWithoutDefaultConstructor;
-import dummies.EmptyDummy;
-import dummies.InheritedCopyableDummy;
+import com.mvgreen.deepcopy.DeepCopyUtil;
+import com.mvgreen.deepcopy.annotations.DeepCopyable;
+import com.mvgreen.deepcopy.exceptions.CloneException;
+import entities.dummies.DummyWithoutDefaultConstructor;
+import entities.dummies.EmptyDummy;
+import entities.ArraysEntity;
+import entities.OuterEntity;
+import entities.PrimitivesEntity;
+import entities.dummies.InheritedCopyableDummy;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DeepCopyUtilTest {
 
@@ -21,10 +26,10 @@ public class DeepCopyUtilTest {
         DummyWithoutDefaultConstructor inherited = new InheritedCopyableDummy(0);
 
         assertThrows(IllegalArgumentException.class, () -> {
-            deepCopyUtil.deepCopy(emptyDummy, Collections.emptyMap());
+            deepCopyUtil.deepCopy(emptyDummy);
         });
         assertThrows(IllegalArgumentException.class, () -> {
-            deepCopyUtil.deepCopy(withoutDefaultConstructor, Collections.emptyMap());
+            deepCopyUtil.deepCopy(withoutDefaultConstructor);
         });
 
         deepCopyUtil.addCloneFactory(new CloneFactory<EmptyDummy>(deepCopyUtil) {
@@ -39,6 +44,95 @@ public class DeepCopyUtilTest {
         assertDoesNotThrow(() -> {
             deepCopyUtil.deepCopy(inherited, Collections.emptyMap());
         });
+    }
+
+    @Test
+    public void deepCopy_primitivesAndStringsAndEnums_areCopiedCorrectly() {
+        DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
+        PrimitivesEntity entity = new PrimitivesEntity(100);
+
+        PrimitivesEntity clone = deepCopyUtil.deepCopy(entity);
+
+        assertNotSame(entity, clone);
+        assertEquals(entity, clone);
+    }
+
+    @Test
+    public void deepCopy_fieldsOfInnerClass_areCopiedCorrectly() {
+        DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
+        OuterEntity entity = new OuterEntity();
+
+        OuterEntity clone = deepCopyUtil.deepCopy(entity);
+
+        assertNotSame(entity, clone);
+        assertEquals(entity, clone);
+    }
+
+    @Test
+    public void deepCopy_standaloneInnerObjects_areCopiedCorrectly() {
+        DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
+        OuterEntity.SecondInnerEntity entity = new OuterEntity().createSecondInnerEntity();
+
+        OuterEntity.SecondInnerEntity clone = deepCopyUtil.deepCopy(entity);
+
+        assertNotSame(entity, clone);
+        assertEquals(entity, clone);
+    }
+
+    @Test
+    public void deepCopy_referencedInnerObjects_areCopiedCorrectly() {
+        DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
+        OuterEntity.SecondInnerEntity entity = new OuterEntity().secondInnerEntity;
+
+        OuterEntity.SecondInnerEntity clone = deepCopyUtil.deepCopy(entity);
+
+        assertNotSame(entity, clone);
+        assertEquals(entity, clone);
+    }
+
+    @Test
+    public void deepCopy_nestedObjects_areDifferentiatedFromInner() {
+        DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
+        OuterEntity.StaticInnerEntity entity = new OuterEntity.StaticInnerEntity(new OuterEntity());
+
+        assertThrows(CloneException.class, () -> deepCopyUtil.deepCopy(entity));
+    }
+
+    @Test
+    public void deepCopy_localClasses_areDeepCopyable() {
+        @DeepCopyable
+        class LocalClass {
+            OuterEntity outerEntity = new OuterEntity();
+
+            @Override
+            public boolean equals(Object o) {
+                if (!(o instanceof LocalClass)) {
+                    return false;
+                }
+                LocalClass other = (LocalClass) o;
+                return Objects.equals(outerEntity, other.outerEntity)
+                        && outerEntity != other.outerEntity;
+            }
+
+        }
+        DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
+        LocalClass entity = new LocalClass();
+
+        LocalClass clone = deepCopyUtil.deepCopy(entity);
+
+        assertNotSame(entity, clone);
+        assertEquals(entity, clone);
+    }
+
+    @Test
+    public void deepCopy_arrayFields_areDeepCopyable() {
+        DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
+        ArraysEntity entity = new ArraysEntity();
+
+        ArraysEntity clone = deepCopyUtil.deepCopy(entity);
+
+        assertNotSame(entity, clone);
+        assertEquals(entity, clone);
     }
 
 }

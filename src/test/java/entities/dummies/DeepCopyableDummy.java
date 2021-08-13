@@ -1,4 +1,4 @@
-package dummies;
+package entities.dummies;
 
 import com.mvgreen.deepcopy.annotations.DeepCopyable;
 

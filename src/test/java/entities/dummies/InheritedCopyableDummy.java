@@ -1,4 +1,4 @@
-package dummies;
+package entities.dummies;
 
 public class InheritedCopyableDummy extends DummyWithoutDefaultConstructor{
 
