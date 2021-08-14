@@ -7,10 +7,17 @@ import java.util.Objects;
 @DeepCopyable
 public class OuterEntity {
 
-    private FirstInnerEntity firstInnerEntity = new FirstInnerEntity(5);
+    private FirstInnerEntity firstInnerEntity;
 
     // both objects hold a reference to each other
-    public SecondInnerEntity secondInnerEntity = new SecondInnerEntity(5);
+    public SecondInnerEntity secondInnerEntity;
+
+    public static OuterEntity newInstance() {
+        OuterEntity entity = new OuterEntity();
+        entity.firstInnerEntity = entity.new FirstInnerEntity(5);
+        entity.secondInnerEntity = entity.new SecondInnerEntity(5);
+        return entity;
+    }
 
     // Outer object does not have a reference to returned value, but the returned one has a reference to Outer
     public SecondInnerEntity createSecondInnerEntity() {

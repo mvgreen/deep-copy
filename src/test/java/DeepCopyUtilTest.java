@@ -2,11 +2,11 @@ import com.mvgreen.deepcopy.CloneFactory;
 import com.mvgreen.deepcopy.DeepCopyUtil;
 import com.mvgreen.deepcopy.annotations.DeepCopyable;
 import com.mvgreen.deepcopy.exceptions.CloneException;
-import entities.dummies.DummyWithoutDefaultConstructor;
-import entities.dummies.EmptyDummy;
 import entities.ArraysEntity;
 import entities.OuterEntity;
 import entities.PrimitivesEntity;
+import entities.dummies.DummyWithoutDefaultConstructor;
+import entities.dummies.EmptyDummy;
 import entities.dummies.InheritedCopyableDummy;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +49,7 @@ public class DeepCopyUtilTest {
     @Test
     public void deepCopy_primitivesAndStringsAndEnums_areCopiedCorrectly() {
         DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
-        PrimitivesEntity entity = new PrimitivesEntity(100);
+        PrimitivesEntity entity = PrimitivesEntity.newInstance();
 
         PrimitivesEntity clone = deepCopyUtil.deepCopy(entity);
 
@@ -60,7 +60,7 @@ public class DeepCopyUtilTest {
     @Test
     public void deepCopy_fieldsOfInnerClass_areCopiedCorrectly() {
         DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
-        OuterEntity entity = new OuterEntity();
+        OuterEntity entity = OuterEntity.newInstance();
 
         OuterEntity clone = deepCopyUtil.deepCopy(entity);
 
@@ -71,7 +71,7 @@ public class DeepCopyUtilTest {
     @Test
     public void deepCopy_standaloneInnerObjects_areCopiedCorrectly() {
         DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
-        OuterEntity.SecondInnerEntity entity = new OuterEntity().createSecondInnerEntity();
+        OuterEntity.SecondInnerEntity entity = OuterEntity.newInstance().createSecondInnerEntity();
 
         OuterEntity.SecondInnerEntity clone = deepCopyUtil.deepCopy(entity);
 
@@ -82,7 +82,7 @@ public class DeepCopyUtilTest {
     @Test
     public void deepCopy_referencedInnerObjects_areCopiedCorrectly() {
         DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
-        OuterEntity.SecondInnerEntity entity = new OuterEntity().secondInnerEntity;
+        OuterEntity.SecondInnerEntity entity = OuterEntity.newInstance().secondInnerEntity;
 
         OuterEntity.SecondInnerEntity clone = deepCopyUtil.deepCopy(entity);
 
@@ -93,16 +93,19 @@ public class DeepCopyUtilTest {
     @Test
     public void deepCopy_nestedObjects_areDifferentiatedFromInner() {
         DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
-        OuterEntity.StaticInnerEntity entity = new OuterEntity.StaticInnerEntity(new OuterEntity());
+        OuterEntity.StaticInnerEntity entity = new OuterEntity.StaticInnerEntity(OuterEntity.newInstance());
 
-        assertThrows(CloneException.class, () -> deepCopyUtil.deepCopy(entity));
+        assertThrows(IllegalArgumentException.class, () -> deepCopyUtil.deepCopy(entity));
     }
 
     @Test
     public void deepCopy_localClasses_areDeepCopyable() {
         @DeepCopyable
         class LocalClass {
-            OuterEntity outerEntity = new OuterEntity();
+            OuterEntity outerEntity;
+
+            public LocalClass() {
+            }
 
             @Override
             public boolean equals(Object o) {
@@ -117,6 +120,7 @@ public class DeepCopyUtilTest {
         }
         DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
         LocalClass entity = new LocalClass();
+        entity.outerEntity = OuterEntity.newInstance();
 
         LocalClass clone = deepCopyUtil.deepCopy(entity);
 
@@ -127,7 +131,7 @@ public class DeepCopyUtilTest {
     @Test
     public void deepCopy_arrayFields_areDeepCopyable() {
         DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
-        ArraysEntity entity = new ArraysEntity();
+        ArraysEntity entity = ArraysEntity.newInstance();
 
         ArraysEntity clone = deepCopyUtil.deepCopy(entity);
 

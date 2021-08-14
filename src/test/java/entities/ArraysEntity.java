@@ -10,31 +10,42 @@ import java.util.Arrays;
 public class ArraysEntity {
 
     @CopyMode(value = CopyMode.Mode.DEEP, copyItems = true)
-    int[] intArray = new int[]{1, 2, 3};
+    int[] intArray;
 
     @CopyMode(value = CopyMode.Mode.SHALLOW, copyItems = true)
-    Integer[] integerArray = new Integer[]{1, null, 3};
+    Integer[] integerArray;
 
     @CopyMode(value = CopyMode.Mode.DEEP, copyItems = true)
-    Integer[][] deepIntegerArray = new Integer[][]{
-            {Integer.valueOf(1), null, 3},
-            null
-    };
+    Integer[][] deepIntegerArray;
 
     @CopyMode(value = CopyMode.Mode.DEEP, copyItems = true)
-    SomeEnum[] enumArray = new SomeEnum[] {
-            SomeEnum.IS_ENUM, SomeEnum.IS_NOT_ENUM
-    };
+    SomeEnum[] enumArray;
 
     @CopyMode(value = CopyMode.Mode.DEEP)
-    EmptyDummy[] entityArray = new EmptyDummy[] {
-            new EmptyDummy(), null
-    };
+    EmptyDummy[] entityArray;
 
     @CopyMode(value = CopyMode.Mode.DEEP, copyItems = true)
-    PrimitivesEntity[] copyableEntityArray = new PrimitivesEntity[] {
-            new PrimitivesEntity(), null
-    };
+    PrimitivesEntity[] copyableEntityArray;
+
+    public static ArraysEntity newInstance() {
+        ArraysEntity entity = new ArraysEntity();
+        entity.intArray = new int[]{1, 2, 3};
+        entity.integerArray = new Integer[]{1, null, 3};
+        entity.deepIntegerArray = new Integer[][]{
+                {Integer.valueOf(1), null, 3},
+                null
+        };
+        entity.enumArray = new SomeEnum[]{
+                SomeEnum.IS_ENUM, SomeEnum.IS_NOT_ENUM
+        };
+        entity.entityArray = new EmptyDummy[]{
+                new EmptyDummy(), null
+        };
+        entity.copyableEntityArray = new PrimitivesEntity[]{
+                new PrimitivesEntity(), null
+        };
+        return entity;
+    }
 
     @Override
     public boolean equals(Object o) {
