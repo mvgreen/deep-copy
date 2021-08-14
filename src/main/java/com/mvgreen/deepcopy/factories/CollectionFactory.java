@@ -30,7 +30,11 @@ public class CollectionFactory extends CloneFactory<Collection<?>> {
                 newParams.remove(CloneFactory.PARAM_COPY_ITEMS);
             }
             for (Object item : src) {
-                clone.add(cloneMember(item, cloneReferences, newParams));
+                if (item == null) {
+                    clone.add(null);
+                } else {
+                    clone.add(cloneMember(item, cloneReferences, newParams));
+                }
             }
         } else {
             clone.addAll(src);

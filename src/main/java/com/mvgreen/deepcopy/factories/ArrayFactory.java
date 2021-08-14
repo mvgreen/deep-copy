@@ -15,9 +15,6 @@ public class ArrayFactory extends CloneFactory<Object> {
 
     @Override
     public Object clone(Object src, Map<Object, Object> cloneReferences, Map<String, Object> params) {
-        if (cloneReferences.containsKey(src)) {
-            return cloneReferences.get(src);
-        }
         int length = Array.getLength(src);
         Object clone = Array.newInstance(src.getClass().getComponentType(), length);
         cloneReferences.put(src, clone);
@@ -31,7 +28,7 @@ public class ArrayFactory extends CloneFactory<Object> {
             if (item == null) {
                 itemClone = null;
             } else if (item.getClass().isArray()) {
-                itemClone = clone(item, cloneReferences, params);
+                itemClone = deepCopyUtil.deepCopy(item, cloneReferences, params);
             } else if (copyItems || copyItemsRecursively) {
                 Map<String, Object> newParams = new HashMap<>(params);
                 if (!copyItemsRecursively) {

@@ -9,7 +9,7 @@ public abstract class CloneFactory<T> {
     public static final String PARAM_COPY_ITEMS = "PARAM_COPY_ITEMS";
     public static final String PARAM_COPY_ITEMS_RECURSIVELY = "PARAM_COPY_ITEMS_RECURSIVELY";
 
-    private DeepCopyUtil deepCopyUtil;
+    protected DeepCopyUtil deepCopyUtil;
 
     public CloneFactory(DeepCopyUtil deepCopyUtil) {
         this.deepCopyUtil = deepCopyUtil;

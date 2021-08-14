@@ -46,7 +46,7 @@ public class DeepCopyUtil {
         return deepCopy(src, cloneReferences, params);
     }
 
-    protected <T> T deepCopy(T src, Map<Object, Object> cloneReferences, Map<String, Object> params) {
+    public <T> T deepCopy(T src, Map<Object, Object> cloneReferences, Map<String, Object> params) {
         validateArgument(src);
         params = params == null ? Collections.emptyMap() : params;
         if (cloneReferences.containsKey(src)) {
