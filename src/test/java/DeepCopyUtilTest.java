@@ -3,6 +3,7 @@ import com.mvgreen.deepcopy.DeepCopyUtil;
 import com.mvgreen.deepcopy.annotations.DeepCopyable;
 import com.mvgreen.deepcopy.exceptions.CloneException;
 import entities.ArraysEntity;
+import entities.CollectionsEntity;
 import entities.OuterEntity;
 import entities.PrimitivesEntity;
 import entities.dummies.DummyWithoutDefaultConstructor;
@@ -137,6 +138,18 @@ public class DeepCopyUtilTest {
 
         assertNotSame(entity, clone);
         assertEquals(entity, clone);
+    }
+
+    @Test
+    public void deepCopy_collectionFields_areDeepCopyable() {
+        DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
+        CollectionsEntity entity = CollectionsEntity.newInstance();
+
+        CollectionsEntity clone = deepCopyUtil.deepCopy(entity);
+
+        assertNotSame(entity, clone);
+        assertEquals(entity, clone);
+        assertTrue(clone.sameElementsInCollections());
     }
 
 }
