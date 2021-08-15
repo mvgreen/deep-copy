@@ -1,11 +1,7 @@
 import com.mvgreen.deepcopy.CloneFactory;
 import com.mvgreen.deepcopy.DeepCopyUtil;
 import com.mvgreen.deepcopy.annotations.DeepCopyable;
-import com.mvgreen.deepcopy.exceptions.CloneException;
-import entities.ArraysEntity;
-import entities.CollectionsEntity;
-import entities.OuterEntity;
-import entities.PrimitivesEntity;
+import entities.*;
 import entities.dummies.DummyWithoutDefaultConstructor;
 import entities.dummies.EmptyDummy;
 import entities.dummies.InheritedCopyableDummy;
@@ -141,15 +137,25 @@ public class DeepCopyUtilTest {
     }
 
     @Test
-    public void deepCopy_collectionFields_areDeepCopyable() {
+    public void deepCopy_standardListFields_areDeepCopyable() {
         DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
-        CollectionsEntity entity = CollectionsEntity.newInstance();
+        ListsEntity entity = ListsEntity.newInstance();
 
-        CollectionsEntity clone = deepCopyUtil.deepCopy(entity);
+        ListsEntity clone = deepCopyUtil.deepCopy(entity);
 
         assertNotSame(entity, clone);
         assertEquals(entity, clone);
-        assertTrue(clone.sameElementsInCollections());
+    }
+
+    @Test
+    public void deepCopy_standardSetFields_areDeepCopyable() {
+        DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
+        SetsEntity entity = SetsEntity.newInstance();
+
+        SetsEntity clone = deepCopyUtil.deepCopy(entity);
+
+        assertNotSame(entity, clone);
+        assertEquals(entity, clone);
     }
 
 }
