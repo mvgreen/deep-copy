@@ -158,4 +158,15 @@ public class DeepCopyUtilTest {
         assertEquals(entity, clone);
     }
 
+    @Test
+    public void deepCopy_standardMapFields_areDeepCopyable() {
+        DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
+        MapsEntity entity = MapsEntity.newInstance();
+
+        MapsEntity clone = deepCopyUtil.deepCopy(entity);
+
+        assertNotSame(entity, clone);
+        assertEquals(entity, clone);
+    }
+
 }

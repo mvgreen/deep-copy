@@ -5,6 +5,7 @@ import com.mvgreen.deepcopy.annotations.DeepCopyable;
 import com.mvgreen.deepcopy.exceptions.CloneException;
 import com.mvgreen.deepcopy.factories.ArrayFactory;
 import com.mvgreen.deepcopy.factories.CollectionFactory;
+import com.mvgreen.deepcopy.factories.MapFactory;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -26,6 +27,7 @@ public class DeepCopyUtil {
 
     public DeepCopyUtil() {
         addCloneFactory(new ArrayFactory(this), Array.class);
+
         CollectionFactory collectionFactory = new CollectionFactory(this);
         addCloneFactory(collectionFactory, ArrayList.class);
         addCloneFactory(collectionFactory, LinkedList.class);
@@ -34,6 +36,10 @@ public class DeepCopyUtil {
 
         addCloneFactory(collectionFactory, HashSet.class);
         addCloneFactory(collectionFactory, LinkedHashSet.class);
+
+        MapFactory mapFactory = new MapFactory(this);
+        addCloneFactory(mapFactory, HashMap.class);
+        addCloneFactory(mapFactory, LinkedHashMap.class);
     }
 
     public <T> T deepCopy(T src) throws CloneException {
@@ -126,10 +132,12 @@ public class DeepCopyUtil {
         }
 
         boolean copyItems = false;
+        boolean copyKeys = false;
         CopyMode.Mode copyMode;
         if (field.isAnnotationPresent(CopyMode.class)) {
             CopyMode annotation = field.getAnnotation(CopyMode.class);
             copyItems = annotation.copyItems();
+            copyKeys = annotation.copyKeys();
             copyMode = annotation.value();
         } else {
             Class<?> klass = srcFieldValue.getClass();
@@ -149,6 +157,7 @@ public class DeepCopyUtil {
             case DEEP:
                 Map<String, Object> newParams = new HashMap<>(params);
                 newParams.put(CloneFactory.PARAM_COPY_ITEMS, copyItems);
+                newParams.put(MapFactory.PARAM_COPY_KEYS, copyKeys);
 
                 Object fieldClone = deepCopy(srcFieldValue, cloneReferences, newParams);
                 field.set(clone, fieldClone);

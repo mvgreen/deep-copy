@@ -17,4 +17,6 @@ public @interface CopyMode {
 
     boolean copyItems() default false;
 
+    boolean copyKeys() default false;
+
 }
