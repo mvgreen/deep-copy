@@ -7,6 +7,7 @@ import entities.dummies.EmptyDummy;
 import entities.dummies.InheritedCopyableDummy;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -167,6 +168,22 @@ public class DeepCopyUtilTest {
 
         assertNotSame(entity, clone);
         assertEquals(entity, clone);
+    }
+
+    @Test
+    public void deepCopy_testEntity_isDeepCopyable() {
+        DeepCopyUtil deepCopyUtil = new DeepCopyUtil();
+        ArrayList<String> books = new ArrayList<>();
+        books.add("Snail on the Slope");
+        books.add("");
+        books.add(null);
+        Man man = new Man("John", 34, books);
+
+        Man clone = deepCopyUtil.deepCopy(man);
+
+        assertNotSame(man, clone);
+        assertNotSame(man.getFavoriteBooks(), clone.getFavoriteBooks());
+        assertEquals(man, clone);
     }
 
 }
