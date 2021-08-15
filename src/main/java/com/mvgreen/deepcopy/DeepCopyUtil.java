@@ -17,14 +17,6 @@ public class DeepCopyUtil {
 
     private Map<Class<?>, CloneFactory<?>> cloneFactories = new HashMap<>();
 
-    public void addCloneFactory(CloneFactory<?> factory, Class<?> klass) {
-        cloneFactories.put(klass, factory);
-    }
-
-    public void removeCloneFactory(Class<?> type) {
-        cloneFactories.remove(type);
-    }
-
     public DeepCopyUtil() {
         addCloneFactory(new ArrayFactory(this), Array.class);
 
@@ -40,6 +32,14 @@ public class DeepCopyUtil {
         MapFactory mapFactory = new MapFactory(this);
         addCloneFactory(mapFactory, HashMap.class);
         addCloneFactory(mapFactory, LinkedHashMap.class);
+    }
+
+    public void addCloneFactory(CloneFactory<?> factory, Class<?> klass) {
+        cloneFactories.put(klass, factory);
+    }
+
+    public void removeCloneFactory(Class<?> type) {
+        cloneFactories.remove(type);
     }
 
     public <T> T deepCopy(T src) throws CloneException {
